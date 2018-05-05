@@ -16,6 +16,7 @@
 package org.apache.ibatis.autoconstructor;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 public class WrapperSubject {
   private final int id;
@@ -25,11 +26,11 @@ public class WrapperSubject {
   private final int weight;
   private final Timestamp dt;
 
-  public WrapperSubject(final int id, final String name, final int age, final Short height, final Short weight, Timestamp dt) {
+  public WrapperSubject(final int id, final String name, final int age, final double height, final double weight, double active, int dt) {
     throw new IllegalStateException("This constructor must not be called because type mismatch.");
   }
 
-  public WrapperSubject(final int id, final String name, final int age, final Integer height, final Integer weight, Timestamp dt) {
+  public WrapperSubject(final int id, final String name, final int age, final Integer height, final Integer weight, byte active, Timestamp dt) {
     this.id = id;
     this.name = name;
     this.age = age;

@@ -23,10 +23,11 @@ CREATE TABLE subject (
   age    INT NOT NULL,
   height INT,
   weight INT,
+  active BIT,
   dt TIMESTAMP
 );
 
-INSERT INTO subject (id, name, age, height, weight, dt) VALUES (1, 'a', 10, 100, 45, CURRENT_TIMESTAMP );
-INSERT INTO subject (id, name, age, height, weight, dt) VALUES (2, 'b', 10, NULL, 45, CURRENT_TIMESTAMP);
-INSERT INTO subject (id, name, age, height, weight, dt) VALUES (2, 'b', 10, NULL, NULL, CURRENT_TIMESTAMP);
+INSERT INTO subject (id, name, age, height, weight, active, dt) VALUES (1, 'a', 10, 100, 45, 1, CURRENT_TIMESTAMP );
+INSERT INTO subject (id, name, age, height, weight, active, dt) VALUES (2, 'b', 10, NULL, 45, 1, CURRENT_TIMESTAMP);
+INSERT INTO subject (id, name, age, height, weight, active, dt) VALUES (2, 'b', 10, NULL, NULL, 0, CURRENT_TIMESTAMP);
 

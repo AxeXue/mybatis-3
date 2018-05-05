@@ -74,6 +74,10 @@ public class ResultSetWrapper {
     return Collections.unmodifiableList(classNames);
   }
 
+  public List<JdbcType> getJdbcTypes() {
+    return jdbcTypes;
+  }
+
   public JdbcType getJdbcType(String columnName) {
     for (int i = 0 ; i < columnNames.size(); i++) {
       if (columnNames.get(i).equalsIgnoreCase(columnName)) {

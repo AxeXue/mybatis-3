@@ -46,6 +46,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
@@ -656,12 +657,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   private Object createByConstructorSignature(ResultSetWrapper rsw, Class<?> resultType, List<Class<?>> constructorArgTypes, List<Object> constructorArgs,
                                               String columnPrefix) throws SQLException {
     final Constructor<?>[] constructors = resultType.getDeclaredConstructors();
-    final Constructor<?> annotatedConstructor = findAnnotatedConstructor(constructors);
-    if (annotatedConstructor != null) {
-      return createUsingConstructor(rsw, resultType, constructorArgTypes, constructorArgs, columnPrefix, annotatedConstructor);
+    final Constructor<?> defaultConstructor = findDefaultConstructor(constructors);
+    if (defaultConstructor != null) {
+      return createUsingConstructor(rsw, resultType, constructorArgTypes, constructorArgs, columnPrefix, defaultConstructor);
     } else {
       for (Constructor<?> constructor : constructors) {
-        if (allowedConstructor(constructor, rsw.getClassNames())) {
+        if (allowedConstructorUsingTypeHandlers(constructor, rsw.getJdbcTypes())) {
           return createUsingConstructor(rsw, resultType, constructorArgTypes, constructorArgs, columnPrefix, constructor);
         }
       }
@@ -683,13 +684,26 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return foundValues ? objectFactory.create(resultType, constructorArgTypes, constructorArgs) : null;
   }
 
-  private Constructor<?> findAnnotatedConstructor(final Constructor<?>[] constructors) {
+  private Constructor<?> findDefaultConstructor(final Constructor<?>[] constructors) {
+    if(constructors.length == 1) return constructors[0];
+
     for (final Constructor<?> constructor : constructors) {
       if (constructor.isAnnotationPresent(AutomapConstructor.class)) {
         return constructor;
       }
     }
     return null;
+  }
+
+  private boolean allowedConstructorUsingTypeHandlers(final Constructor<?> constructor, final List<JdbcType> jdbcTypes) {
+    final Class<?>[] parameterTypes = constructor.getParameterTypes();
+    if (parameterTypes.length != jdbcTypes.size()) return false;
+    for (int i = 0; i < parameterTypes.length; i++) {
+      if(!typeHandlerRegistry.hasTypeHandler(parameterTypes[i], jdbcTypes.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean allowedConstructor(final Constructor<?> constructor, final List<String> classNames) {
